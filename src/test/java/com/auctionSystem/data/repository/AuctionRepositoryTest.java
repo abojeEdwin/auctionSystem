@@ -40,7 +40,7 @@ class AuctionRepositoryTest {
         Auction auction = new Auction();
 
         User user = new User();
-        user.setFullname("Edwin me");
+        user.setFullname("Edwin wolf");
         user.setEmail("abojeedwin@gmail.com");
         user.setPassword("password");
         user.setUsername("choko@08");
@@ -56,6 +56,32 @@ class AuctionRepositoryTest {
         auctionRepository.save(auction);
 
         assert auctionRepository.findById(auction.getId()).isPresent();
+    }
+
+    @Test
+    public void findAuctionByIdTest(){
+        Auction auction = new Auction();
+
+        User user = new User();
+
+        user.setFullname("Edwin wolf");
+        user.setEmail("abojeedwin@gmail.com");
+        user.setPassword("password");
+        user.setUsername("choko@08");
+        user.setRole(Roles.USER);
+        userRepository.save(user);
+
+        auction.setSeller(user);
+        auction.setTitle("Toyota Evil Spirit");
+        auction.setDescription("Black,V8 engine");
+        auction.setStatus(AuctionStatus.PENDING);
+        auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        auction.setStartingPrice(17000.00);
+        auctionRepository.save(auction);
+        assert auctionRepository.count() == 1;
+        Auction foundAuction = auctionRepository.findById(auction.getId()).get();
+        assert foundAuction.getTitle().equals(auction.getTitle());
+
     }
 
 }
