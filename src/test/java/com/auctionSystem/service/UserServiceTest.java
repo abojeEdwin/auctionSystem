@@ -100,4 +100,21 @@ class UserServiceTest {
         assert userService.count() == 0;
     }
 
+    @Test
+    public void loginUserTest(){
+        User user = new User();
+        user.setFullname("Amali Precious");
+        user.setRole(Roles.USER);
+        user.setUsername("DarkKnight@14");
+        user.setPassword("password");
+        user.setEmail("email@gmail.com");
+        userService.register(user);
+        assert userService.count() == 1;
+        assertNotNull(user);
+
+       User loginUser =  userService.login(user.getPassword(),user.getEmail());
+       assert loginUser.getFullname().equals("Amali Precious");
+
+    }
+
 }

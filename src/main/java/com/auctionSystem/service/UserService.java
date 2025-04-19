@@ -55,4 +55,8 @@ public class UserService {
     }
 
 
+    public User login(String password, String email) {
+        User user = userRepository.findByEmail(email);
+        return user;
+    }
 }
