@@ -13,13 +13,15 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 
 @Service
 public class UserService {
+
+
+
 
     private static BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static String EMAIL_REGEX =
@@ -110,5 +112,9 @@ public class UserService {
         Bid savedBid = bidRepository.save(bidPlaced);
         bidSocketController.notifyNewBid(savedBid);
         return savedBid;
+    }
+
+    public Bid getCurrentBid() {
+        return bidSocketController.getLastNotifiedBid();
     }
 }
