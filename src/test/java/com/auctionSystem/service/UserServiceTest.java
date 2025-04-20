@@ -1,4 +1,5 @@
 package com.auctionSystem.service;
+import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.*;
 import com.auctionSystem.data.repository.AdminRepository;
 import com.auctionSystem.data.repository.AuctionRepository;
@@ -32,6 +33,9 @@ class UserServiceTest {
 
     @Autowired
     AdminService adminService;
+
+    @Autowired
+    BidSocketController bidSocketController;
 
     @BeforeEach
     void setUp() {
@@ -268,7 +272,11 @@ class UserServiceTest {
         bidPlaced.setAmount(1500.0);
         bidPlaced.setAuction(changedAuction);
         Bid savedBid = userService.placeBid(bidPlaced);
+        Bid notifiedBid = bidSocketController.getLastNotifiedBid();
+        assert notifiedBid.getBidder().getFullname().equals("Joseph King");
+        assert notifiedBid.getAmount() == 1500.0;
         assert savedBid.getAuction().getSeller().getFullname().equals("Amali Precious");
+
 
 
     }

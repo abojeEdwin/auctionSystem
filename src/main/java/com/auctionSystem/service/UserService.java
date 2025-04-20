@@ -1,4 +1,5 @@
 package com.auctionSystem.service;
+import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.model.Bid;
@@ -32,6 +33,9 @@ public class UserService {
 
     @Autowired
     AuctionRepository auctionRepository;
+
+    @Autowired
+    private BidSocketController bidSocketController;
 
     public User register(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
@@ -103,6 +107,8 @@ public class UserService {
         if(bidPlaced.getAuction().getStatus().equals(AuctionStatus.PENDING)){
             throw new PendingBidException("Auction status is PENDING");
         }
-        return bidRepository.save(bidPlaced);
+        Bid savedBid = bidRepository.save(bidPlaced);
+        bidSocketController.notifyNewBid(savedBid);
+        return savedBid;
     }
 }
