@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface AuctionRepository extends MongoRepository<Auction, String> {
 
+    Auction findAuctionById(String id);
 }

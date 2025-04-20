@@ -1,23 +1,19 @@
 package com.auctionSystem.service;
-import com.auctionSystem.data.model.Auction;
-import com.auctionSystem.data.model.AuctionStatus;
-import com.auctionSystem.data.model.Roles;
-import com.auctionSystem.data.model.User;
+import com.auctionSystem.data.model.*;
+import com.auctionSystem.data.repository.AdminRepository;
 import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.data.repository.UserRepository;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.exceptions.*;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
 class UserServiceTest {
@@ -31,16 +27,24 @@ class UserServiceTest {
     @Autowired
     AuctionRepository auctionRepository;
 
+    @Autowired
+    AdminRepository adminRepository;
+
+    @Autowired
+    AdminService adminService;
+
     @BeforeEach
     void setUp() {
         userService.deleteAll();
         auctionRepository.deleteAll();
+        adminRepository.deleteAll();
     }
 
     @AfterEach
     void tearDown() {
         userService.deleteAll();
         auctionRepository.deleteAll();
+        adminRepository.deleteAll();
     }
 
     @Test
@@ -209,6 +213,121 @@ class UserServiceTest {
 
         userService.deleteAuctionById(savedAuction.getId());
         assert auctionRepository.count() == 0;
+    }
+
+    @Test
+    public void placeBidTest(){
+        Admin admin = new Admin();
+        admin.setUsername("Supreme admin");
+        admin.setPassword("password");
+        admin.setRole(Roles.ADMIN);
+        admin.setEmail("adminonly@gmail.com");
+        admin.setFullname("Admin Yoda");
+        Admin savedAdmin = adminService.register(admin);
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("adminonly@gmail.com");
+        loginRequest.setPassword("password");
+        Admin loginAdmin = adminService.login(loginRequest);
+        Assertions.assertNotNull(loginAdmin.getId());
+
+
+        User seller = new User();
+        seller.setFullname("Amali Precious");
+        seller.setRole(Roles.USER);
+        seller.setUsername("DarkKnight@14");
+        seller.setPassword("password");
+        seller.setEmail("email@gmail.com");
+        userService.register(seller);
+
+        Auction auction = new Auction();
+        auction.setTitle("Auction Tittle");
+        auction.setDescription("Auction Description");
+        auction.setCurrentPrice(150.0);
+        auction.setStartingPrice(100.00);
+        auction.setStatus(AuctionStatus.PENDING);
+        auction.setSeller(seller);
+        auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        Auction savedAuction = userService.createAuction(auction);
+        assert savedAuction.getTitle().equals("Auction Tittle");
+
+        Auction changedAuction = adminService.verifyListedAuction(auction);
+        assert changedAuction.getTitle().equals("Auction Tittle");
+        assert changedAuction.getStatus() == AuctionStatus.ACTIVE;
+
+        User buyer = new User();
+        buyer.setFullname("Joseph King");
+        buyer.setRole(Roles.USER);
+        buyer.setUsername("RastaMan123");
+        buyer.setPassword("password");
+        buyer.setEmail("reggeneverdies@gmail.com");
+        userService.register(buyer);
+
+        Bid bidPlaced = new Bid();
+        bidPlaced.setBidder(buyer);
+        bidPlaced.setAmount(1500.0);
+        bidPlaced.setAuction(changedAuction);
+        Bid savedBid = userService.placeBid(bidPlaced);
+        assert savedBid.getAuction().getSeller().getFullname().equals("Amali Precious");
+
+
+    }
+
+    @Test
+    public void bidsCannotBePlacedWhenAuctionIsPendingTest(){
+
+        Admin admin = new Admin();
+        admin.setUsername("Supreme admin");
+        admin.setPassword("password");
+        admin.setRole(Roles.ADMIN);
+        admin.setEmail("adminonly@gmail.com");
+        admin.setFullname("Admin Yoda");
+        Admin savedAdmin = adminService.register(admin);
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("adminonly@gmail.com");
+        loginRequest.setPassword("password");
+        Admin loginAdmin = adminService.login(loginRequest);
+
+        User seller = new User();
+        seller.setFullname("Amali Precious");
+        seller.setRole(Roles.USER);
+        seller.setUsername("DarkKnight@14");
+        seller.setPassword("password");
+        seller.setEmail("email@gmail.com");
+        userService.register(seller);
+
+        Auction auction = new Auction();
+        auction.setTitle("Auction Tittle");
+        auction.setDescription("Auction Description");
+        auction.setCurrentPrice(150.0);
+        auction.setStartingPrice(100.00);
+        auction.setStatus(AuctionStatus.PENDING);
+        auction.setSeller(seller);
+        auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        Auction savedAuction = userService.createAuction(auction);
+        assert savedAuction.getTitle().equals("Auction Tittle");
+
+        User buyer = new User();
+        buyer.setFullname("Joseph King");
+        buyer.setRole(Roles.USER);
+        buyer.setUsername("RastaMan123");
+        buyer.setPassword("password");
+        buyer.setEmail("reggeneverdies@gmail.com");
+        userService.register(buyer);
+
+        Bid bidPlaced = new Bid();
+        bidPlaced.setBidder(buyer);
+        bidPlaced.setAmount(1500.0);
+        bidPlaced.setAuction(auction);
+        assertThrows(PendingBidException.class,()->userService.placeBid(bidPlaced));
+        Auction changedAuction = adminService.verifyListedAuction(auction);
+        assert changedAuction.getSeller().getFullname().equals("Amali Precious");
+        assert changedAuction.getStatus() == AuctionStatus.ACTIVE;
+
+
+
+
     }
 
 }

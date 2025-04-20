@@ -1,5 +1,7 @@
 package com.auctionSystem.service;
 import com.auctionSystem.data.model.Auction;
+import com.auctionSystem.data.model.AuctionStatus;
+import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.data.repository.BidRepository;
@@ -93,8 +95,14 @@ public class UserService {
         return auctionRepository.save(auction);
     }
 
-
     public void deleteAuctionById(@NotNull String id) {
         auctionRepository.deleteById(id);
+    }
+
+    public Bid placeBid(Bid bidPlaced) {
+        if(bidPlaced.getAuction().getStatus().equals(AuctionStatus.PENDING)){
+            throw new PendingBidException("Auction status is PENDING");
+        }
+        return bidRepository.save(bidPlaced);
     }
 }
