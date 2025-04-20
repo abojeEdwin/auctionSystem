@@ -1,15 +1,16 @@
 package com.auctionSystem.service;
+import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.User;
+import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.data.repository.BidRepository;
 import com.auctionSystem.data.repository.UserRepository;
-import com.auctionSystem.dtos.RegisterUserRequest;
-import com.auctionSystem.exceptions.DuplicateEmailException;
-import com.auctionSystem.exceptions.DuplicateUserNameException;
-import com.auctionSystem.exceptions.InvalidEmailException;
+import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
@@ -25,6 +26,9 @@ public class UserService {
 
     @Autowired
     BidRepository bidRepository;
+
+    @Autowired
+    AuctionRepository auctionRepository;
 
     public User register(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
@@ -54,9 +58,28 @@ public class UserService {
                 .matches();
     }
 
+    public static boolean verifyPassword(String hashedPassword, String inputPassword) {
+        if (hashedPassword == null || hashedPassword.isEmpty() ||
+                inputPassword == null || inputPassword.isEmpty()) {
+            return false;
+        }
 
-    public User login(String password, String email) {
-        User user = userRepository.findByEmail(email);
+        try {
+            return passwordEncoder.matches(inputPassword, hashedPassword);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public User login(LoginRequest loginRequest) {
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+        if(user == null){throw new UserNotFoundException("User not found");}
+        if(!(Objects.equals(user.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
+        if(!verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
         return user;
+    }
+
+    public Auction createAuction(Auction auction) {
+        return auctionRepository.save(auction);
     }
 }
