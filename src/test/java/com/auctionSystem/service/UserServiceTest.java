@@ -34,11 +34,13 @@ class UserServiceTest {
     @BeforeEach
     void setUp() {
         userService.deleteAll();
+        auctionRepository.deleteAll();
     }
 
     @AfterEach
     void tearDown() {
         userService.deleteAll();
+        auctionRepository.deleteAll();
     }
 
     @Test
@@ -164,14 +166,49 @@ class UserServiceTest {
 
     @Test
     public void createAuctionTest(){
+        User user = new User();
+        user.setFullname("Amali Precious");
+        user.setRole(Roles.USER);
+        user.setUsername("DarkKnight@14");
+        user.setPassword("password");
+        user.setEmail("email@gmail.com");
+        userService.register(user);
+
         Auction auction = new Auction();
-        auction.setTitle("Auction Title");
+        auction.setTitle("Auction Tittle");
         auction.setDescription("Auction Description");
-        auction.setStartingPrice(17000.00);
+        auction.setCurrentPrice(150.0);
+        auction.setStartingPrice(100.00);
         auction.setStatus(AuctionStatus.PENDING);
+        auction.setSeller(user);
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
         Auction savedAuction = userService.createAuction(auction);
-        assert savedAuction.getTitle().equals("Auction Title");
+        assert savedAuction.getTitle().equals("Auction Tittle");
+    }
+
+    @Test
+    public void deleteAuctionTest(){
+        User user = new User();
+        user.setFullname("Amali Precious");
+        user.setRole(Roles.USER);
+        user.setUsername("DarkKnight@14");
+        user.setPassword("password");
+        user.setEmail("email@gmail.com");
+        userService.register(user);
+
+        Auction auction = new Auction();
+        auction.setTitle("Auction Tittle");
+        auction.setDescription("Auction Description");
+        auction.setCurrentPrice(150.0);
+        auction.setStartingPrice(100.00);
+        auction.setStatus(AuctionStatus.PENDING);
+        auction.setSeller(user);
+        auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        Auction savedAuction = userService.createAuction(auction);
+        assert savedAuction.getTitle().equals("Auction Tittle");
+
+        userService.deleteAuctionById(savedAuction.getId());
+        assert auctionRepository.count() == 0;
     }
 
 }

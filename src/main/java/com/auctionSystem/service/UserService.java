@@ -6,6 +6,7 @@ import com.auctionSystem.data.repository.BidRepository;
 import com.auctionSystem.data.repository.UserRepository;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.exceptions.*;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,20 @@ public class UserService {
     }
 
     public Auction createAuction(Auction auction) {
+        if(auction.getDescription().equals(" ") || auction.getTitle().equals(" ")){
+            throw new NullAuctionException("Auction values cannot be empty");
+        }
+        if(auction.getSeller() == null || auction.getStatus() == null){
+            throw new NullAuctionException("Auction values cannot be empty");
+        }
+        if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){
+            throw new NullAuctionException("Auction prices cannot be less than 0");
+        }
         return auctionRepository.save(auction);
+    }
+
+
+    public void deleteAuctionById(@NotNull String id) {
+        auctionRepository.deleteById(id);
     }
 }
