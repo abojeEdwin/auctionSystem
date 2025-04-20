@@ -15,7 +15,7 @@ public class BidSocketController {
 
     private Bid notifyNewBid;
 
-    // Call this when a new bid is placed
+
     public void notifyNewBid(Bid bid) {
         this.notifyNewBid = bid;
         messagingTemplate.convertAndSend(
@@ -24,7 +24,7 @@ public class BidSocketController {
         );
     }
 
-    // Call this when auction status changes
+
     public void notifyAuctionStatus(Auction auction) {
         messagingTemplate.convertAndSend(
                 "/topic/auction/" + auction.getId() + "/status",
