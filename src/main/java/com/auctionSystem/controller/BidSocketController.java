@@ -14,18 +14,20 @@ public class BidSocketController {
     SimpMessagingTemplate messagingTemplate;
 
     private Bid notifyNewBid;
+    private Auction auctionStatus;
 
 
     public void notifyNewBid(Bid bid) {
         this.notifyNewBid = bid;
+
+
         messagingTemplate.convertAndSend(
                 "/topic/auction/" + "/bids",
-                new BidMessage(bid.getAmount(), bid.getBidder().getUsername())
-        );
+                new BidMessage(bid.getAmount(), bid.getBidder().getUsername()));
     }
 
-
     public void notifyAuctionStatus(Auction auction) {
+        this.auctionStatus = auction;
         messagingTemplate.convertAndSend(
                 "/topic/auction/" + auction.getId() + "/status",
                 new StatusMessage(auction.getStatus(), auction.getEndTime())
@@ -34,5 +36,9 @@ public class BidSocketController {
 
     public Bid getLastNotifiedBid() {
         return notifyNewBid;
+    }
+
+    public Auction getNotifiedAuctionStatus() {
+        return auctionStatus;
     }
 }

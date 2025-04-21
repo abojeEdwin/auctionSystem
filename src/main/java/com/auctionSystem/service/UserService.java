@@ -40,9 +40,12 @@ public class UserService {
     private BidSocketController bidSocketController;
 
     public User register(User user) {
+        if(user.getFullname().equals("") || user.getFullname().equals(" ")){throw new InvalidUserNameException("Please enter a valid full name");}
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
         if(userRepository.existsByEmail(user.getEmail())) {throw new DuplicateEmailException("Email already exists");}
         if(!isValidEmail(user.getEmail())){throw new InvalidEmailException("Please enter a valid email");};
+        if(user.getPassword().equals("") || user.getPassword().equals(" ")){throw new InvalidPasswordException("Please enter a valid password");}
+
 
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
@@ -116,5 +119,9 @@ public class UserService {
 
     public Bid getCurrentBid() {
         return bidSocketController.getLastNotifiedBid();
+    }
+
+    public Auction getCurrentAuctionStatus() {
+        return bidSocketController.getNotifiedAuctionStatus();
     }
 }

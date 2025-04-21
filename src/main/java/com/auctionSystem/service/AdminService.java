@@ -1,4 +1,5 @@
 package com.auctionSystem.service;
+import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Admin;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.AuctionStatus;
@@ -21,6 +22,9 @@ public class AdminService {
 
     @Autowired
     AuctionRepository auctionRepository;
+
+    @Autowired
+    BidSocketController bidSocketController;
 
     private static BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static String EMAIL_REGEX =
@@ -56,7 +60,9 @@ public class AdminService {
 
         if (foundAuction.getStatus() == AuctionStatus.PENDING) {
             foundAuction.setStatus(AuctionStatus.ACTIVE);
-            return auctionRepository.save(foundAuction);
+            Auction activatedAuction = auctionRepository.save(foundAuction);
+            bidSocketController.notifyAuctionStatus(activatedAuction);
+            return activatedAuction;
         }
         return foundAuction;
     }
