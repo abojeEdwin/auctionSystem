@@ -12,9 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Users {
     @Id
     private String id;
-    @NotNull
-    @NotBlank(message = "Full name cannot be empty")
-    @Size(min = 2, max = 50, message = "Full name must be between 2 and 50 characters")
     private String fullname;
     @Indexed(unique = true)
     private String email;

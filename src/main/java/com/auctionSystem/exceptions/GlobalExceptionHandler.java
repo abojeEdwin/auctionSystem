@@ -57,8 +57,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidUserNameException.class)
-    public ResponseEntity<String> handleInvalidUserName(InvalidUserNameException ex) {
+    @ExceptionHandler(InvalidCredentialException.class)
+    public ResponseEntity<String> handleInvalidCredentialException(InvalidCredentialException ex) {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 

@@ -22,10 +22,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid@RequestBody User user) {
         User userSaved = userService.register(user);
-        if(userSaved.getFullname().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        if (userSaved == null) {
+        if (userSaved == null || userSaved.getFullname().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(userSaved, HttpStatus.CREATED);
@@ -44,8 +41,9 @@ public class UserController {
     }
 
     @PostMapping("/createAuction")
-    public Auction createAuction(@RequestBody Auction auction) {
-        return userService.createAuction(auction);
+    public ResponseEntity<Auction> createAuction(@Valid @RequestBody Auction auction) {
+        Auction auctionSaved = userService.createAuction(auction);
+        return new ResponseEntity<>(auctionSaved, HttpStatus.CREATED);
     }
 
 }
