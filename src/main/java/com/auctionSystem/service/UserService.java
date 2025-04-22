@@ -8,6 +8,7 @@ import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.data.repository.BidRepository;
 import com.auctionSystem.data.repository.UserRepository;
 import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ public class UserService {
 
     @Autowired
     private BidSocketController bidSocketController;
+
+    @Autowired
+    JwtService jwtService;
 
     public User register(User user) {
 
@@ -83,12 +87,12 @@ public class UserService {
         }
     }
 
-    public User login(LoginRequest loginRequest) {
+    public UserResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
-        if(user == null){throw new UserNotFoundException("User not found");}
         if(!(Objects.equals(user.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
         if(!verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
-        return user;
+        String token = jwtService.generateToken(user.getUsername());
+        return new UserResponse(token,user.getId(),user.getUsername(),user.getEmail());
     }
 
     public Auction createAuction(Auction auction) {

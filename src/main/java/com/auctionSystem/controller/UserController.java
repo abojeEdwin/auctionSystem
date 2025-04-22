@@ -3,6 +3,7 @@ import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.UserRepository;
 import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +30,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@Valid@RequestBody LoginRequest loginRequest) {
-        User user = userService.login(loginRequest);
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!loginRequest.getPassword().equals(user.getPassword())) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(user, HttpStatus.FOUND);
+    public ResponseEntity<UserResponse> login(@Valid@RequestBody LoginRequest loginRequest) {
+        UserResponse loginResponse = userService.login(loginRequest);
+        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
     @PostMapping("/createAuction")
-    public ResponseEntity<Auction> createAuction(@Valid @RequestBody Auction auction) {
+    public ResponseEntity<Auction> createAuction(@RequestBody Auction auction) {
         Auction auctionSaved = userService.createAuction(auction);
         return new ResponseEntity<>(auctionSaved, HttpStatus.CREATED);
     }

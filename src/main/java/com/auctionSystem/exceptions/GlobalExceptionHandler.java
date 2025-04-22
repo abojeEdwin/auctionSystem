@@ -76,6 +76,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAll(Exception ex) {
+        ex.printStackTrace(); // Log to console
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
 
 
 }
