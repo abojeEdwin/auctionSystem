@@ -19,8 +19,6 @@ public class BidSocketController {
 
     public void notifyNewBid(Bid bid) {
         this.notifyNewBid = bid;
-
-
         messagingTemplate.convertAndSend(
                 "/topic/auction/" + "/bids",
                 new BidMessage(bid.getAmount(), bid.getBidder().getUsername()));
