@@ -89,17 +89,19 @@ public class UserService {
 
     public UserResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
+        if(user == null) {throw new UserNotFoundException("User not found");}
         if(!(Objects.equals(user.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
         if(!verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
         String token = jwtService.generateToken(user.getUsername());
-        return new UserResponse(token,user.getId(),user.getUsername(),user.getEmail());
+        return new UserResponse(token,user.getId(),user.getEmail(),user.getUsername());
     }
 
     public Auction createAuction(Auction auction) {
-        if(auction.getDescription().equals(" ") || auction.getTitle().equals(" ")){
+
+        if(auction.getDescription().isEmpty() || auction.getTitle().isEmpty()){
             throw new NullAuctionException("Auction values cannot be empty");
         }
-        if(auction.getSeller() == null || auction.getStatus() == null){
+        if(auction.getSellerId() == null || auction.getStatus() == null){
             throw new NullAuctionException("Auction values cannot be empty");
         }
         if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){
@@ -113,9 +115,10 @@ public class UserService {
     }
 
     public Bid placeBid(Bid bidPlaced) {
-        if(bidPlaced.getAuction().getStatus().equals(AuctionStatus.PENDING)){
-            throw new PendingBidException("Auction status is PENDING");
-        }
+        if(bidPlaced.getBidderId() == null || bidPlaced.getAuctionItemId() == null || bidPlaced.getAmount() <= 0){ throw new NullAuctionException("Invalid bid details");}
+        Auction auctionItem = auctionRepository.findById(bidPlaced.getAuctionItemId()).get();
+        if(auctionItem == null) {throw new AuctionNotFoundException("Auction item not found");}
+        if(bidPlaced.getAmount() < auctionItem.getStartingPrice() || bidPlaced.getAmount() < auctionItem.getCurrentPrice()){ throw new NullAuctionException("Bid amount must be greater than or equal to the starting price");}
         Bid savedBid = bidRepository.save(bidPlaced);
         bidSocketController.notifyNewBid(savedBid);
         return savedBid;

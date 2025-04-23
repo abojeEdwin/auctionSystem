@@ -47,11 +47,12 @@ class AuctionRepositoryTest {
         user.setRole(Roles.USER);
         userRepository.save(user);
 
-        auction.setSeller(user);
+
         auction.setTitle("Toyota Evil Spirit");
         auction.setDescription("Black,V8 engine");
         auction.setStatus(AuctionStatus.PENDING);
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
+        auction.setSellerId(user.getId());
         auction.setStartingPrice(17000.00);
         auctionRepository.save(auction);
 
@@ -71,7 +72,7 @@ class AuctionRepositoryTest {
         user.setRole(Roles.USER);
         userRepository.save(user);
 
-        auction.setSeller(user);
+
         auction.setTitle("Toyota Evil Spirit");
         auction.setDescription("Black,V8 engine");
         auction.setStatus(AuctionStatus.PENDING);

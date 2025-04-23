@@ -1,4 +1,5 @@
 package com.auctionSystem.data.model;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,8 +26,8 @@ public class Auction {
     private double currentPrice;
     @NotNull
     private Instant endTime;
-    @NotNull
-    private User seller;
+    @NotNull @NotBlank
+    private String sellerId;
     @NotNull
     private AuctionStatus status = AuctionStatus.PENDING;
 }

@@ -57,7 +57,7 @@ class BidRepositoryTest {
         userRepository.save(user1);
 
         Auction auction = new Auction();
-        auction.setSeller(user1);
+
         auction.setStatus(AuctionStatus.PENDING);
         auction.setDescription("Laptop");
         auction.setStartingPrice(1500.00);
@@ -66,9 +66,9 @@ class BidRepositoryTest {
         auctionRepository.save(auction);
 
         Bid bid = new Bid();
-        bid.setBidder(user);
+        bid.setBidderId(user1.getId());
         bid.setAmount(1603.998);
-        bid.setAuction(auction);
+        bid.setAuctionItemId(auction.getId());
         bid.setTimestamp(Instant.now());
         bidRepository.save(bid);
         assertEquals(1,bidRepository.count());
@@ -101,24 +101,24 @@ class BidRepositoryTest {
         userRepository.save(userbidder2);
 
         Auction auction = new Auction();
-        auction.setSeller(userseller);
         auction.setStatus(AuctionStatus.PENDING);
         auction.setDescription("Laptop: 8gb ram ");
         auction.setStartingPrice(1500.00);
+        auction.setSellerId(userseller.getId());
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
         auction.setCurrentPrice(1550.00);
         auctionRepository.save(auction);
 
         Bid bid = new Bid();
-        bid.setBidder(userbidder1);
+        bid.setBidderId(userbidder1.getId());
         bid.setAmount(1603.998);
-        bid.setAuction(auction);
+        bid.setAuctionItemId(auction.getId());
         bid.setTimestamp(Instant.now());
         bidRepository.save(bid);
 
         Bid secondbidder = new Bid();
-        secondbidder.setBidder(userbidder2);
-        secondbidder.setAuction(auction);
+        secondbidder.setBidderId(userbidder2.getId());
+        secondbidder.setAuctionItemId(auction.getId());
         secondbidder.setAmount(1700.00);
         secondbidder.setTimestamp(Instant.now());
         bidRepository.save(secondbidder);
@@ -157,30 +157,30 @@ class BidRepositoryTest {
         userRepository.save(userbidder2);
 
         Auction auction = new Auction();
-        auction.setSeller(userseller);
         auction.setStatus(AuctionStatus.PENDING);
         auction.setDescription("Laptop: 8gb ram ");
         auction.setStartingPrice(1500.00);
+        auction.setSellerId(userseller.getId());
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
         auction.setCurrentPrice(1550.00);
         auctionRepository.save(auction);
 
         Bid bid = new Bid();
-        bid.setBidder(userbidder1);
+        bid.setBidderId(userbidder1.getId());
         bid.setAmount(1603.998);
-        bid.setAuction(auction);
+        bid.setAuctionItemId(auction.getId());
         bid.setTimestamp(Instant.now());
         bidRepository.save(bid);
 
         Bid secondbidder = new Bid();
-        secondbidder.setBidder(userbidder2);
-        secondbidder.setAuction(auction);
+        secondbidder.setAuctionItemId(userbidder2.getId());
+        secondbidder.setAuctionItemId(auction.getId());
         secondbidder.setAmount(1700.00);
         secondbidder.setTimestamp(Instant.now());
         bidRepository.save(secondbidder);
 
         Bid foundBids = bidRepository.findBidsById(bid.getId());
-        assertEquals( "Laptop: 8gb ram ",foundBids.getAuction().getDescription());
+        assertEquals( 1603.998,foundBids.getAmount());
 
     }
 
@@ -211,24 +211,25 @@ class BidRepositoryTest {
         userRepository.save(userbidder2);
 
         Auction auction = new Auction();
-        auction.setSeller(userseller);
+
         auction.setStatus(AuctionStatus.PENDING);
         auction.setDescription("Laptop: 8gb ram ");
         auction.setStartingPrice(1500.00);
+        auction.setSellerId(userseller.getId());
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
         auction.setCurrentPrice(1550.00);
         auctionRepository.save(auction);
 
         Bid bid = new Bid();
-        bid.setBidder(userbidder1);
+        bid.setBidderId(userbidder1.getId());
         bid.setAmount(1603.998);
-        bid.setAuction(auction);
+        bid.setAuctionItemId(auction.getId());
         bid.setTimestamp(Instant.now());
         bidRepository.save(bid);
 
         Bid secondbidder = new Bid();
-        secondbidder.setBidder(userbidder2);
-        secondbidder.setAuction(auction);
+        secondbidder.setBidderId(userbidder2.getId());
+        secondbidder.setAuctionItemId(auction.getId());
         secondbidder.setAmount(1700.00);
         secondbidder.setTimestamp(Instant.now());
         bidRepository.save(secondbidder);

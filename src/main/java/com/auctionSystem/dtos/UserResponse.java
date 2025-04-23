@@ -12,5 +12,4 @@ public class UserResponse {
     String email;
     String username;
 
-
 }

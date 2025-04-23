@@ -12,8 +12,8 @@ import java.time.Instant;
 public class Bid {
     @Id
     private String id;
-    private User bidder;
+    private String bidderId;
     private double amount;
-    private Auction auction;
+    private String auctionItemId;
     private Instant timestamp = Instant.now();
 }
