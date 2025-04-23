@@ -50,12 +50,23 @@ public class JwtService {
         byte[] keybytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keybytes);
     }
-//
-//    public String extractUsername(String token) {
-//        return extractClaim()
-//    }
-//
-//    public Boolean validateToken(String token, User user) {
-//
-//    }
+
+    public boolean validateToken(String token, String id) {
+        final String extractedId = extractId(token);
+        return (extractedId.equals(id) && !isTokenExpired(token));
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    private Date extractExpiration(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getExpiration();
+    }
+
+    public String extractId(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    }
+
+
 }
