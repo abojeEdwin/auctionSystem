@@ -1,5 +1,6 @@
 package com.auctionSystem.data.model;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
 
 
+
 @Document(collection="Auction")
 @Data
 @AllArgsConstructor
@@ -16,9 +18,10 @@ import java.time.Instant;
 public class Auction {
     @Id @NotNull
     private String id;
-    @NotNull
+    @NotNull @NotEmpty
+    @NotBlank(message="Auction title cannot be empty")
     private String title;
-    @NotNull
+    @NotNull @NotBlank(message="Auction description cannot be empty")
     private String description;
     @NotNull
     private double startingPrice;
@@ -26,7 +29,8 @@ public class Auction {
     private double currentPrice;
     @NotNull
     private Instant endTime;
-    @NotNull @NotBlank
+    @NotNull @NotEmpty
+    @NotBlank(message="Bidder Id cannot be empty or whitespace")
     private String sellerId;
     @NotNull
     private AuctionStatus status = AuctionStatus.PENDING;

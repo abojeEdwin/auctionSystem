@@ -1,4 +1,5 @@
 package com.auctionSystem.service;
+import com.auctionSystem.data.model.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -49,4 +50,12 @@ public class JwtService {
         byte[] keybytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keybytes);
     }
+//
+//    public String extractUsername(String token) {
+//        return extractClaim()
+//    }
+//
+//    public Boolean validateToken(String token, User user) {
+//
+//    }
 }

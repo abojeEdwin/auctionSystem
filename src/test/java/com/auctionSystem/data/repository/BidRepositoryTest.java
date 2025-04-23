@@ -144,7 +144,7 @@ class BidRepositoryTest {
         userbidder1.setFullname("samson you");
         userbidder1.setEmail("abj@gmail.com");
         userbidder1.setPassword("password");
-        userbidder1.setUsername("chiken@8");
+        userbidder1.setUsername("chicken@8");
         userbidder1.setRole(Roles.USER);
         userRepository.save(userbidder1);
 

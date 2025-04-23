@@ -198,7 +198,7 @@ class UserServiceTest {
         auction.setCurrentPrice(150.0);
         auction.setStartingPrice(100.00);
         auction.setStatus(AuctionStatus.PENDING);
-        auction.setSellerId(" ");
+        auction.setSellerId(user.getId());
         auction.setEndTime(Instant.now().plus(2, ChronoUnit.HOURS));
         Auction savedAuction = userService.createAuction(auction);
         assert savedAuction.getTitle().equals("Auction Tittle");

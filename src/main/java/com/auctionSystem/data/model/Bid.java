@@ -1,4 +1,6 @@
 package com.auctionSystem.data.model;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -12,8 +14,10 @@ import java.time.Instant;
 public class Bid {
     @Id
     private String id;
+    @NotBlank(message = "Bidder Id cannot be empty or whitespace")
     private String bidderId;
     private double amount;
+    @NotBlank(message="Auction Item Id Cannot Be Empty") @NotEmpty
     private String auctionItemId;
     private Instant timestamp = Instant.now();
 }
