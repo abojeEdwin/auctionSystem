@@ -211,7 +211,7 @@ class UserServiceTest {
         user.setRole(Roles.USER);
         user.setUsername("DarkKnight@14");
         user.setPassword("password");
-        user.setEmail("email@gmail.com");
+        user.setEmail("abojeedwin@gmail.com");
         userService.register(user);
 
         Auction auction = new Auction();

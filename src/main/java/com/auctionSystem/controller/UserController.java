@@ -55,4 +55,9 @@ public class UserController {
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteAuction")
+    public ResponseEntity<Boolean> deleteAuction(@RequestBody Auction auction) {
+        return userService.deleteAuctionById(auction.getId());
+    }
+
 }

@@ -1,4 +1,5 @@
 package com.auctionSystem.data.model;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,7 @@ public class Users {
     private String id;
     private String fullname;
     @Indexed(unique = true)
+    @Email(message = "Email cannot be empty")
     private String email;
     private String password;
     private Roles role = Roles.USER;

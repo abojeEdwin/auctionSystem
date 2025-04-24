@@ -1,7 +1,6 @@
 package com.auctionSystem.service;
 import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
-import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.AuctionRepository;
@@ -12,6 +11,7 @@ import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Objects;
@@ -111,8 +111,9 @@ public class UserService {
         return auctionRepository.save(auction);
     }
 
-    public void deleteAuctionById(@NotNull String id) {
+    public ResponseEntity<Boolean> deleteAuctionById(@NotNull String id) {
         auctionRepository.deleteById(id);
+        return null;
     }
 
     public Bid placeBid(Bid bidPlaced) {
