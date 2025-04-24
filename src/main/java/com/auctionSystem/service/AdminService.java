@@ -6,6 +6,7 @@ import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.repository.AdminRepository;
 import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,6 +27,9 @@ public class AdminService {
     @Autowired
     BidSocketController bidSocketController;
 
+    @Autowired
+    JwtService jwtService;
+
     private static BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static String EMAIL_REGEX =
             "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
@@ -43,12 +47,12 @@ public class AdminService {
         return adminRepository.save(admin);
     }
 
-    public Admin login(LoginRequest loginRequest) {
+    public UserResponse login(LoginRequest loginRequest) {
         Admin foundAdmin = adminRepository.findByEmail(loginRequest.getEmail());
         if (foundAdmin == null) {throw new UserNotFoundException("User not found");}
         if(!verifyPassword(foundAdmin.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("Invalid password");}
-
-        return foundAdmin;
+        String token = jwtService.generateToken(foundAdmin.getUsername());
+        return new UserResponse(token, foundAdmin.getId(), foundAdmin.getEmail(),foundAdmin.getUsername());
     }
 
     public Auction verifyListedAuction(Auction auction) {
