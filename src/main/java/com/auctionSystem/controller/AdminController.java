@@ -1,11 +1,15 @@
 package com.auctionSystem.controller;
 import com.auctionSystem.data.model.Admin;
+import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.dtos.UserResponse;
+import com.auctionSystem.exceptions.UserNotFoundException;
 import com.auctionSystem.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +21,7 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @PostMapping("/admin/register")
     public ResponseEntity<Admin> register(Admin admin) {
         Admin savedAdmin = adminService.register(admin);
         if (savedAdmin == null || savedAdmin.getId() == null ||savedAdmin.getFullname().isEmpty()|| savedAdmin.getFullname().equals(" ")) {
@@ -25,7 +30,15 @@ public class AdminController {
         return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
     }
 
-//    public ResponseEntity<Admin> login(LoginRequest loginRequest) {
-//        Admin savedAdmin = adminService.login(loginRequest);
-//    }
+    @PostMapping("/admin/login")
+    public ResponseEntity<UserResponse> login(LoginRequest loginRequest) {
+        UserResponse savedAdmin = adminService.login(loginRequest);
+        if(savedAdmin == null){throw new UserNotFoundException("USER NOT FOUND");}
+        return new ResponseEntity<>(savedAdmin, HttpStatus.OK);
+    }
+
+    @PostMapping("/admin/verifyListedAuction")
+    public ResponseEntity<Auction> verifyListedAuction(Auction auction) {
+        return new ResponseEntity<>(adminService.verifyListedAuction(auction), HttpStatus.OK);
+    }
 }

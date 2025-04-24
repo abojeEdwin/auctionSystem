@@ -56,12 +56,12 @@ public class AdminService {
     }
 
     public Auction verifyListedAuction(Auction auction) {
-        if (auction == null) {
-            throw new IllegalArgumentException("Auction cannot be null");
-        }
         Auction foundAuction = auctionRepository.findById(auction.getId())
                 .orElseThrow(() -> new AuctionNotFoundException("Auction not found with id: " + auction.getId()));
 
+        if (auction == null) {
+            throw new IllegalArgumentException("Auction cannot be null");
+        }
         if (foundAuction.getStatus() == AuctionStatus.PENDING) {
             foundAuction.setStatus(AuctionStatus.ACTIVE);
             Auction activatedAuction = auctionRepository.save(foundAuction);
