@@ -49,7 +49,7 @@ public class UserService {
         if(userRepository.existsByEmail(user.getEmail())) {throw new DuplicateEmailException("Email already exists");}
         if(!isValidEmail(user.getEmail())){throw new InvalidEmailException("Please enter a valid email");};
         if(user.getPassword().isEmpty() || user.getFullname().isEmpty()){throw new InvalidCredentialException("Please enter valid credentials");}
-
+        if(user.getFullname().equals(" ") || user.getFullname().equals("")){throw new InvalidCredentialException("Please enter valid credentials");}
 
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
@@ -107,6 +107,7 @@ public class UserService {
         if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){
             throw new NullAuctionException("Auction prices cannot be less than 0");
         }
+        bidSocketController.notifyAuctionStatus(auction);
         return auctionRepository.save(auction);
     }
 
@@ -122,6 +123,11 @@ public class UserService {
         Bid savedBid = bidRepository.save(bidPlaced);
         bidSocketController.notifyNewBid(savedBid);
         return savedBid;
+    }
+
+    public Bid getBidHistory(@NotNull String auctionItemId) {
+        if(auctionItemId == null){throw new NullAuctionException("Auction id is required");}
+        return bidRepository.findById(auctionItemId).get();
     }
 
     public Bid getCurrentBid() {

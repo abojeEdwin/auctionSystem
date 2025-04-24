@@ -1,5 +1,6 @@
 package com.auctionSystem.controller;
 import com.auctionSystem.data.model.Auction;
+import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.UserRepository;
 import com.auctionSystem.dtos.LoginRequest;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user/api")
@@ -38,6 +41,18 @@ public class UserController {
     public ResponseEntity<Auction> createAuction(@RequestBody Auction auction) {
         Auction auctionSaved = userService.createAuction(auction);
         return new ResponseEntity<>(auctionSaved, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/placeBid")
+    public ResponseEntity<Bid> placeBid(@RequestBody Bid bid) {
+        userService.placeBid(bid);
+        return new ResponseEntity<>(bid, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/getBidHistory")
+    public ResponseEntity<List<Bid>> getBidHistory(@RequestBody String auctionId) {
+        userService.getBidHistory(auctionId);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
 }
