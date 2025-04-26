@@ -124,14 +124,25 @@ public class UserService {
     }
 
     public Bid placeBid(Bid bidPlaced) {
-        if(bidPlaced.getBidderId() == null || bidPlaced.getAuctionItemId() == null || bidPlaced.getAmount() <= 0){ throw new NullAuctionException("Invalid bid details");}
-        Auction auctionItem = auctionRepository.findAuctionById(bidPlaced.getAuctionItemId());
-        if(auctionItem.getStatus()== AuctionStatus.PENDING){throw new AuctionNotFoundException("Auction item is still pending");}
-        if(auctionItem == null) {throw new AuctionNotFoundException("Auction item not found");}
-        if(bidPlaced.getAmount() < auctionItem.getStartingPrice() || bidPlaced.getAmount() < auctionItem.getCurrentPrice()){ throw new NullAuctionException("Bid amount must be greater than or equal to the starting price");}
+        validateBid(bidPlaced);
+        validateAuction(bidPlaced);
         Bid savedBid = bidRepository.save(bidPlaced);
         bidSocketController.notifyNewBid(savedBid);
         return savedBid;
+    }
+
+
+    private void  validateBid(Bid bid){
+       if(bid.getAuctionItemId().isEmpty() || bid.getAuctionItemId() .equals(" ")){throw new NullAuctionException("Auction item id cannot be empty");}
+       if(bid.getAmount()<=0){throw new NullAuctionException("Auction amount cannot be less than 0");}
+       if(bid.getTimestamp()==null){throw new NullAuctionException("Timestamp cannot be null");}
+       if(bid.getBidderId()==null || bid.getBidderId().equals(" ") || bid.getBidderId().isEmpty()){throw new NullAuctionException("Bidder id cannot be null");}
+    }
+
+    private void validateAuction(Bid bidPlaced){
+        Auction auctionItem = auctionRepository.findAuctionById(bidPlaced.getAuctionItemId());
+        if(auctionItem.getStatus()== AuctionStatus.PENDING){throw new AuctionNotFoundException("Auction item is still pending");}
+        if(bidPlaced.getAmount() < auctionItem.getStartingPrice() || bidPlaced.getAmount() < auctionItem.getCurrentPrice()){ throw new NullAuctionException("Bid amount must be greater than or equal to the starting price");}
     }
 
     public Bid getBidHistory(@NotNull String auctionItemId) {

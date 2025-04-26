@@ -14,11 +14,14 @@ public class Bid {
     @Id
     private String id;
     @NotBlank(message = "Bidder Id cannot be empty or whitespace")
+    @NotEmpty
     private String bidderId;
     @NotBlank(message="This field is required")
     private double amount;
     @NotBlank(message="Auction Item Id Cannot Be Empty")
     @NotEmpty
     private String auctionItemId;
+    @NotBlank(message="This field is required")
+    @NotEmpty
     private Instant timestamp = Instant.now();
 }

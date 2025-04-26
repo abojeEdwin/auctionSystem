@@ -27,11 +27,11 @@ public class Auction {
     private double startingPrice;
     @NotNull
     private double currentPrice = startingPrice;
-    @NotNull
+    @NotNull @NotBlank(message="This field is required")
     private Instant endTime;
     @NotNull @NotEmpty
     @NotBlank(message="Bidder Id cannot be empty or whitespace")
     private String sellerId;
-    @NotNull
+    @NotNull @NotBlank(message="This field is required")
     private AuctionStatus status = AuctionStatus.PENDING;
 }

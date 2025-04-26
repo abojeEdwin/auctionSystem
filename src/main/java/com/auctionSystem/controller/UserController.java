@@ -2,7 +2,8 @@ package com.auctionSystem.controller;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
-import com.auctionSystem.data.repository.UserRepository;
+
+import com.auctionSystem.dtos.AuctionVerificationRequest;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.service.UserService;
@@ -50,14 +51,16 @@ public class UserController {
     }
 
     @GetMapping("/getBidHistory")
-    public ResponseEntity<List<Bid>> getBidHistory(@RequestBody String auctionId) {
-        userService.getBidHistory(auctionId);
+    public ResponseEntity<List<Bid>> getBidHistory(@Valid @RequestBody AuctionVerificationRequest request) {
+        userService.getBidHistory(request.getAuctionId());
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteAuction")
-    public ResponseEntity<Boolean> deleteAuction(@RequestBody Auction auction) {
-        return userService.deleteAuctionById(auction.getId());
+    public ResponseEntity<Boolean> deleteAuction(@Valid @RequestBody AuctionVerificationRequest request) {
+        userService.deleteAuctionById(request.getAuctionId());
+        return new ResponseEntity<>(true, HttpStatus.OK);
+
     }
 
 }
