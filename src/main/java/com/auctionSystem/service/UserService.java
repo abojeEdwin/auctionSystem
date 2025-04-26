@@ -1,6 +1,7 @@
 package com.auctionSystem.service;
 import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
+import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.AuctionRepository;
@@ -10,14 +11,19 @@ import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 
+@Slf4j
 @Service
 public class UserService {
 
@@ -50,7 +56,6 @@ public class UserService {
         if(!isValidEmail(user.getEmail())){throw new InvalidEmailException("Please enter a valid email");};
         if(user.getPassword().isEmpty() || user.getFullname().isEmpty()){throw new InvalidCredentialException("Please enter valid credentials");}
         if(user.getFullname().equals(" ") || user.getFullname().equals("")){throw new InvalidCredentialException("Please enter valid credentials");}
-
         String hashedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(hashedPassword);
         return userRepository.save(user);
@@ -89,7 +94,6 @@ public class UserService {
 
     public UserResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
-        if(user == null) {throw new UserNotFoundException("User not found");}
         if(!(Objects.equals(user.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
         if(!verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
         String token = jwtService.generateToken(user.getUsername());
@@ -107,6 +111,9 @@ public class UserService {
         if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){
             throw new NullAuctionException("Auction prices cannot be less than 0");
         }
+        auction.setStartingPrice(auction.getCurrentPrice());
+        Instant endTime = Instant.now().plus(3, ChronoUnit.HOURS);
+        auction.setEndTime(endTime);
         bidSocketController.notifyAuctionStatus(auction);
         return auctionRepository.save(auction);
     }
@@ -118,7 +125,8 @@ public class UserService {
 
     public Bid placeBid(Bid bidPlaced) {
         if(bidPlaced.getBidderId() == null || bidPlaced.getAuctionItemId() == null || bidPlaced.getAmount() <= 0){ throw new NullAuctionException("Invalid bid details");}
-        Auction auctionItem = auctionRepository.findById(bidPlaced.getAuctionItemId()).get();
+        Auction auctionItem = auctionRepository.findAuctionById(bidPlaced.getAuctionItemId());
+        if(auctionItem.getStatus()== AuctionStatus.PENDING){throw new AuctionNotFoundException("Auction item is still pending");}
         if(auctionItem == null) {throw new AuctionNotFoundException("Auction item not found");}
         if(bidPlaced.getAmount() < auctionItem.getStartingPrice() || bidPlaced.getAmount() < auctionItem.getCurrentPrice()){ throw new NullAuctionException("Bid amount must be greater than or equal to the starting price");}
         Bid savedBid = bidRepository.save(bidPlaced);

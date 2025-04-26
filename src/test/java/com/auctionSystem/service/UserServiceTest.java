@@ -242,7 +242,7 @@ class UserServiceTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("adminonly@gmail.com");
         loginRequest.setPassword("password");
-        Admin loginAdmin = adminService.login(loginRequest);
+        UserResponse loginAdmin = adminService.login(loginRequest);
         Assertions.assertNotNull(loginAdmin.getId());
 
 
@@ -265,7 +265,7 @@ class UserServiceTest {
         Auction savedAuction = userService.createAuction(auction);
         assert savedAuction.getTitle().equals("Auction Tittle");
 
-        Auction changedAuction = adminService.verifyListedAuction(auction);
+        Auction changedAuction = adminService.verifyListedAuction(auction.getId());
         assert changedAuction.getTitle().equals("Auction Tittle");
         assert changedAuction.getStatus() == AuctionStatus.ACTIVE;
 

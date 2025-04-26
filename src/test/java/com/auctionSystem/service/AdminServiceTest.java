@@ -3,6 +3,7 @@ import com.auctionSystem.data.model.Admin;
 import com.auctionSystem.data.model.Roles;
 import com.auctionSystem.data.repository.AdminRepository;
 import com.auctionSystem.dtos.LoginRequest;
+import com.auctionSystem.dtos.UserResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,9 +58,25 @@ class AdminServiceTest {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("adminonly@gmail.com");
         loginRequest.setPassword("password");
-        Admin loginAdmin = adminService.login(loginRequest);
+        UserResponse loginAdmin = adminService.login(loginRequest);
         Assertions.assertNotNull(loginAdmin.getId());
 
     }
 
+    @Test
+    public void findAdminById(){
+        Admin admin = new Admin();
+        admin.setUsername("Supreme admin");
+        admin.setPassword("password");
+        admin.setRole(Roles.ADMIN);
+        admin.setEmail("adminonly@gmail.com");
+        admin.setFullname("Admin Yoda");
+        Admin savedAdmin = adminService.register(admin);
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setEmail("adminonly@gmail.com");
+        loginRequest.setPassword("password");
+        UserResponse loginAdmin = adminService.login(loginRequest);
+        assertEquals(savedAdmin.getEmail(), adminRepository.findById(savedAdmin.getId()).get().getEmail());
+
+    }
 }

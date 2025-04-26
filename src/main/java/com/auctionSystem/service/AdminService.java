@@ -3,6 +3,7 @@ import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Admin;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.AuctionStatus;
+import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.AdminRepository;
 import com.auctionSystem.data.repository.AuctionRepository;
 import com.auctionSystem.dtos.LoginRequest;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
@@ -36,11 +38,11 @@ public class AdminService {
 
 
     public Admin register(Admin admin) {
-
-        Admin foundAdmin = adminRepository.findByEmail(admin.getEmail());
+        if(adminRepository.existsByUsername(admin.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
         if(adminRepository.existsByEmail(admin.getEmail())) {throw new DuplicateEmailException("Email already exists");}
-        if(adminRepository.existsByUsername(admin.getUsername())) {throw new UserNotFoundException("Username already exists");}
-        if(!isValidEmail(admin.getEmail())) {throw new InvalidEmailException("Invalid email");}
+        if(!isValidEmail(admin.getEmail())){throw new InvalidEmailException("Please enter a valid email");};
+        if(admin.getPassword().isEmpty() || admin.getFullname().isEmpty()){throw new InvalidCredentialException("Please enter valid credentials");}
+        if(admin.getFullname().equals(" ") || admin.getFullname().equals("")){throw new InvalidCredentialException("Please enter valid credentials");}
 
         String hashedPassword = passwordEncoder.encode(admin.getPassword());
         admin.setPassword(hashedPassword);
@@ -49,26 +51,22 @@ public class AdminService {
 
     public UserResponse login(LoginRequest loginRequest) {
         Admin foundAdmin = adminRepository.findByEmail(loginRequest.getEmail());
-        if (foundAdmin == null) {throw new UserNotFoundException("User not found");}
-        if(!verifyPassword(foundAdmin.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("Invalid password");}
+        if(!(Objects.equals(loginRequest.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
+        if(!verifyPassword(foundAdmin.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
         String token = jwtService.generateToken(foundAdmin.getUsername());
-        return new UserResponse(token, foundAdmin.getId(), foundAdmin.getEmail(),foundAdmin.getUsername());
+        return new UserResponse(token,foundAdmin.getId(),foundAdmin.getEmail(),foundAdmin.getUsername());
     }
 
-    public Auction verifyListedAuction(Auction auction) {
-        Auction foundAuction = auctionRepository.findById(auction.getId())
-                .orElseThrow(() -> new AuctionNotFoundException("Auction not found with id: " + auction.getId()));
-
-        if (auction == null) {
-            throw new IllegalArgumentException("Auction cannot be null");
+    public Auction verifyListedAuction(String auctionId) {
+        Auction foundAuction = auctionRepository.findAuctionById(auctionId);
+        if (foundAuction.getStatus() != AuctionStatus.PENDING) {
+            throw new AuctionNotFoundException(
+                    "Auction " + auctionId + " has invalid status: " + foundAuction.getStatus());
         }
-        if (foundAuction.getStatus() == AuctionStatus.PENDING) {
-            foundAuction.setStatus(AuctionStatus.ACTIVE);
-            Auction activatedAuction = auctionRepository.save(foundAuction);
-            bidSocketController.notifyAuctionStatus(activatedAuction);
-            return activatedAuction;
-        }
-        return foundAuction;
+        foundAuction.setStatus(AuctionStatus.ACTIVE);
+        Auction activatedAuction = auctionRepository.save(foundAuction);
+        bidSocketController.notifyAuctionStatus(activatedAuction);
+        return activatedAuction;
     }
 
 

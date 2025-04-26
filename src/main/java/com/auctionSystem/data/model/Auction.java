@@ -26,7 +26,7 @@ public class Auction {
     @NotNull
     private double startingPrice;
     @NotNull
-    private double currentPrice;
+    private double currentPrice = startingPrice;
     @NotNull
     private Instant endTime;
     @NotNull @NotEmpty

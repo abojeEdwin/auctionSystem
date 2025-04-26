@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.math.BigDecimal;
 import java.time.Instant;
 
 @Document(collection= "Bid")
@@ -16,8 +15,10 @@ public class Bid {
     private String id;
     @NotBlank(message = "Bidder Id cannot be empty or whitespace")
     private String bidderId;
+    @NotBlank(message="This field is required")
     private double amount;
-    @NotBlank(message="Auction Item Id Cannot Be Empty") @NotEmpty
+    @NotBlank(message="Auction Item Id Cannot Be Empty")
+    @NotEmpty
     private String auctionItemId;
     private Instant timestamp = Instant.now();
 }
