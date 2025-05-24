@@ -7,7 +7,6 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 public class StatusMessage {
-
     private AuctionStatus status;
     private Instant endTime;
 

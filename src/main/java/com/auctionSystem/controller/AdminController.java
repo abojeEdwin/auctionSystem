@@ -39,5 +39,4 @@ public class AdminController {
         if(savedAdmin == null){throw new UserNotFoundException("USER NOT FOUND");}
         return new ResponseEntity<>(savedAdmin, HttpStatus.OK);
     }
-
 }

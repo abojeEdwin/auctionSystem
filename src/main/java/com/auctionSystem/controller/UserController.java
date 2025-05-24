@@ -1,8 +1,5 @@
 package com.auctionSystem.controller;
-import com.auctionSystem.data.model.Auction;
-import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
-import com.auctionSystem.dtos.AuctionVerificationRequest;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.service.UserService;
@@ -11,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user/api")

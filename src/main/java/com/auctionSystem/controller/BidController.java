@@ -25,6 +25,4 @@ public class BidController {
         userService.getBidHistory(request.getAuctionId());
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
-
-
 }
