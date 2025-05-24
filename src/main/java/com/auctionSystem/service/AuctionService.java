@@ -3,7 +3,6 @@ import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.repository.AuctionRepository;
-import com.auctionSystem.data.repository.BidRepository;
 import com.auctionSystem.exceptions.AuctionNotFoundException;
 import com.auctionSystem.exceptions.NullAuctionException;
 import org.springframework.beans.factory.annotation.Autowired;
