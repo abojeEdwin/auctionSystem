@@ -1,11 +1,7 @@
 package com.auctionSystem.controller;
 import com.auctionSystem.data.model.Admin;
-import com.auctionSystem.data.model.Auction;
-import com.auctionSystem.data.model.User;
-import com.auctionSystem.dtos.AuctionVerificationRequest;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.dtos.UserResponse;
-import com.auctionSystem.exceptions.AuctionNotFoundException;
 import com.auctionSystem.exceptions.UserNotFoundException;
 import com.auctionSystem.service.AdminService;
 import com.auctionSystem.service.AuctionService;
@@ -33,9 +29,9 @@ public class AdminController {
         Admin savedAdmin = adminService.register(admin);
         if (savedAdmin == null || savedAdmin.getId() == null ||savedAdmin.getFullname().isEmpty()|| savedAdmin.getFullname().equals(" ")) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
+        }return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -44,22 +40,4 @@ public class AdminController {
         return new ResponseEntity<>(savedAdmin, HttpStatus.OK);
     }
 
-    @PostMapping("/verifyListedAuction")
-    public ResponseEntity<?> verifyListedAuction(@Valid @RequestBody AuctionVerificationRequest request) {
-        try {
-            Auction auction = auctionService.verifyListedAuction(request.getAuctionId());
-
-            if (auction == null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("Auction is not in PENDING status");
-            }
-
-            return ResponseEntity.ok(auction);
-        } catch (AuctionNotFoundException ex) {
-            return ResponseEntity.notFound().build();
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError()
-                    .body("Error processing request: " + ex.getMessage());
-        }
-    }
 }

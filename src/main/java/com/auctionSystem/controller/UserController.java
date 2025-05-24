@@ -26,10 +26,8 @@ public class UserController {
     public ResponseEntity<User> register(@Valid@RequestBody User user) {
         User userSaved = userService.register(user);
         if (userSaved == null || userSaved.getFullname().isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(userSaved, HttpStatus.CREATED);
-    }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);}
+        return new ResponseEntity<>(userSaved, HttpStatus.CREATED);}
 
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@Valid@RequestBody LoginRequest loginRequest) {
@@ -37,29 +35,5 @@ public class UserController {
         return new ResponseEntity<>(loginResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/createAuction")
-    public ResponseEntity<Auction> createAuction(@RequestBody Auction auction) {
-        Auction auctionSaved = userService.createAuction(auction);
-        return new ResponseEntity<>(auctionSaved, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/placeBid")
-    public ResponseEntity<Bid> placeBid(@RequestBody Bid bid) {
-        userService.placeBid(bid);
-        return new ResponseEntity<>(bid, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/getBidHistory")
-    public ResponseEntity<List<Bid>> getBidHistory(@Valid @RequestBody AuctionVerificationRequest request) {
-        userService.getBidHistory(request.getAuctionId());
-        return new ResponseEntity<>(null, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/deleteAuction")
-    public ResponseEntity<Boolean> deleteAuction(@Valid @RequestBody AuctionVerificationRequest request) {
-        userService.deleteAuctionById(request.getAuctionId());
-        return new ResponseEntity<>(true, HttpStatus.OK);
-
-    }
 
 }

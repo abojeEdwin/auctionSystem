@@ -4,7 +4,6 @@ import com.auctionSystem.Util.ValidateBid;
 import com.auctionSystem.Util.VerifyEmail;
 import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
-import com.auctionSystem.data.model.AuctionStatus;
 import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.AuctionRepository;
@@ -18,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Service
