@@ -40,6 +40,11 @@ public class UserService {
     HashPassword hashPassword;
     @Autowired
     ValidateBid validateBid;
+    @Autowired
+    AuctionService auctionService;
+    @Autowired
+    BidService bidService;
+
 
     public User register(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
@@ -47,14 +52,6 @@ public class UserService {
         if (!VerifyEmail.isValidEmail(user.getEmail())){throw new InvalidEmailException("Invalid email");};
         user.setPassword(HashPassword.hashPassword(user.getPassword()));
         return userRepository.save(user);
-    }
-
-    public void deleteAll() {
-        userRepository.deleteAll();
-    }
-
-    public long count() {
-        return userRepository.count();
     }
 
     public UserResponse login(LoginRequest loginRequest) {
@@ -66,14 +63,7 @@ public class UserService {
     }
 
     public Auction createAuction(Auction auction) {
-        if(auction.getDescription().isEmpty() || auction.getTitle().isEmpty()){throw new NullAuctionException("Auction values cannot be empty");}
-        if(auction.getSellerId() == null || auction.getStatus() == null){throw new NullAuctionException("Auction values cannot be empty");}
-        if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){throw new NullAuctionException("Auction prices cannot be less than 0");}
-        auction.setStartingPrice(auction.getCurrentPrice());
-        Instant endTime = Instant.now().plus(3, ChronoUnit.HOURS);
-        auction.setEndTime(endTime);
-        bidSocketController.notifyAuctionStatus(auction);
-        return auctionRepository.save(auction);
+       return auctionService.createAuction(auction);
     }
 
     public ResponseEntity<Boolean> deleteAuctionById(@NotNull String id) {
@@ -90,13 +80,8 @@ public class UserService {
     }
 
 
-
-
-
-
     public Bid getBidHistory(@NotNull String auctionItemId) {
-        if(auctionItemId == null){throw new NullAuctionException("Auction id is required");}
-        return bidRepository.findById(auctionItemId).get();
+     return bidService.getBidHistory(auctionItemId);
     }
 
     public Bid getCurrentBid() {
@@ -105,5 +90,13 @@ public class UserService {
 
     public Auction getCurrentAuctionStatus() {
         return bidSocketController.getNotifiedAuctionStatus();
+    }
+
+    public void deleteAll() {
+        userRepository.deleteAll();
+    }
+
+    public long count() {
+        return userRepository.count();
     }
 }
