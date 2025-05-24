@@ -2,7 +2,6 @@ package com.auctionSystem.controller;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.Bid;
 import com.auctionSystem.data.model.User;
-
 import com.auctionSystem.dtos.AuctionVerificationRequest;
 import com.auctionSystem.dtos.LoginRequest;
 import com.auctionSystem.dtos.UserResponse;

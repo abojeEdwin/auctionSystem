@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAll(Exception ex) {
-        ex.printStackTrace(); // Log to console
+        ex.printStackTrace();
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 

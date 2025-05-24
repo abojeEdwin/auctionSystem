@@ -1,4 +1,6 @@
 package com.auctionSystem.service;
+import com.auctionSystem.Util.HashPassword;
+import com.auctionSystem.Util.VerifyEmail;
 import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
 import com.auctionSystem.data.model.AuctionStatus;
@@ -28,12 +30,6 @@ import java.util.regex.Pattern;
 public class UserService {
 
 
-
-
-    private static BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    private static String EMAIL_REGEX =
-            "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
     @Autowired
     UserRepository userRepository;
 
@@ -42,21 +38,18 @@ public class UserService {
 
     @Autowired
     AuctionRepository auctionRepository;
-
     @Autowired
     private BidSocketController bidSocketController;
-
     @Autowired
     JwtService jwtService;
+    @Autowired
+    HashPassword hashPassword;
 
     public User register(User user) {
-
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
         if(userRepository.existsByEmail(user.getEmail())) {throw new DuplicateEmailException("Email already exists");}
-        if(!isValidEmail(user.getEmail())){throw new InvalidEmailException("Please enter a valid email");};
-        if(user.getPassword().isEmpty() || user.getFullname().isEmpty()){throw new InvalidCredentialException("Please enter valid credentials");}
-        if(user.getFullname().equals(" ") || user.getFullname().equals("")){throw new InvalidCredentialException("Please enter valid credentials");}
-        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        if (!VerifyEmail.isValidEmail(user.getEmail())){throw new InvalidEmailException("Invalid email");};
+        String hashedPassword = HashPassword.hashPassword(user.getPassword());
         user.setPassword(hashedPassword);
         return userRepository.save(user);
     }
@@ -69,48 +62,18 @@ public class UserService {
         return userRepository.count();
     }
 
-    public static String hashPassword(String rawPassword) {
-        return passwordEncoder.encode(rawPassword);
-    }
-
-    public static boolean isValidEmail(String email) {
-        return Pattern.compile(EMAIL_REGEX)
-                .matcher(email)
-                .matches();
-    }
-
-    public static boolean verifyPassword(String hashedPassword, String inputPassword) {
-        if (hashedPassword == null || hashedPassword.isEmpty() ||
-                inputPassword == null || inputPassword.isEmpty()) {
-            return false;
-        }
-
-        try {
-            return passwordEncoder.matches(inputPassword, hashedPassword);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     public UserResponse login(LoginRequest loginRequest) {
         User user = userRepository.findByEmail(loginRequest.getEmail());
-        if(!(Objects.equals(user.getEmail(), loginRequest.getEmail()))){ throw new UserNotFoundException("user not found");};
-        if(!verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
+        if(user == null){ throw new UserNotFoundException("user not found");};
+        if(!HashPassword.verifyPassword(user.getPassword(),loginRequest.getPassword())) {throw new InvalidPasswordException("incorrect password");}
         String token = jwtService.generateToken(user.getUsername());
         return new UserResponse(token,user.getId(),user.getEmail(),user.getUsername());
     }
 
     public Auction createAuction(Auction auction) {
-
-        if(auction.getDescription().isEmpty() || auction.getTitle().isEmpty()){
-            throw new NullAuctionException("Auction values cannot be empty");
-        }
-        if(auction.getSellerId() == null || auction.getStatus() == null){
-            throw new NullAuctionException("Auction values cannot be empty");
-        }
-        if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){
-            throw new NullAuctionException("Auction prices cannot be less than 0");
-        }
+        if(auction.getDescription().isEmpty() || auction.getTitle().isEmpty()){throw new NullAuctionException("Auction values cannot be empty");}
+        if(auction.getSellerId() == null || auction.getStatus() == null){throw new NullAuctionException("Auction values cannot be empty");}
+        if(auction.getStartingPrice() <= 0 || auction.getCurrentPrice() <= 0 ){throw new NullAuctionException("Auction prices cannot be less than 0");}
         auction.setStartingPrice(auction.getCurrentPrice());
         Instant endTime = Instant.now().plus(3, ChronoUnit.HOURS);
         auction.setEndTime(endTime);
