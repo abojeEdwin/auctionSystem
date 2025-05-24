@@ -33,9 +33,7 @@ public class AuctionService {
     public Auction verifyListedAuction(String auctionId) {
         Auction foundAuction = auctionRepository.findAuctionById(auctionId);
         if (foundAuction.getStatus() != AuctionStatus.PENDING) {
-            throw new AuctionNotFoundException(
-                    "Auction " + auctionId + " has invalid status: " + foundAuction.getStatus());
-        }
+            throw new AuctionNotFoundException("Auction " + auctionId + " has invalid status: " + foundAuction.getStatus());}
         foundAuction.setStatus(AuctionStatus.ACTIVE);
         Auction activatedAuction = auctionRepository.save(foundAuction);
         bidSocketController.notifyAuctionStatus(activatedAuction);

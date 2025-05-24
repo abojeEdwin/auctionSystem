@@ -38,6 +38,9 @@ class UserServiceTest {
     @Autowired
     BidSocketController bidSocketController;
 
+    @Autowired
+    AuctionService auctionService;
+
     @BeforeEach
     void setUp() {
         userService.deleteAll();
@@ -265,7 +268,7 @@ class UserServiceTest {
         Auction savedAuction = userService.createAuction(auction);
         assert savedAuction.getTitle().equals("Auction Tittle");
 
-        Auction changedAuction = adminService.verifyListedAuction(auction.getId());
+        Auction changedAuction = auctionService.verifyListedAuction(auction.getId());
         assert changedAuction.getTitle().equals("Auction Tittle");
         assert changedAuction.getStatus() == AuctionStatus.ACTIVE;
 

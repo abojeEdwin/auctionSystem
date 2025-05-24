@@ -10,8 +10,6 @@ import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Objects;
-
 
 @Service
 public class AdminService {
@@ -44,7 +42,5 @@ public class AdminService {
         String token = jwtService.generateToken(foundAdmin.getUsername());
         return new UserResponse(token,foundAdmin.getId(),foundAdmin.getEmail(),foundAdmin.getUsername());
     }
-
-
 
 }

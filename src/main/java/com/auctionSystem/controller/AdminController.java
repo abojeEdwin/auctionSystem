@@ -8,6 +8,7 @@ import com.auctionSystem.dtos.UserResponse;
 import com.auctionSystem.exceptions.AuctionNotFoundException;
 import com.auctionSystem.exceptions.UserNotFoundException;
 import com.auctionSystem.service.AdminService;
+import com.auctionSystem.service.AuctionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,8 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+    @Autowired
+    private AuctionService auctionService;
 
     @PostMapping("/register")
     public ResponseEntity<Admin> register(@Valid @RequestBody Admin admin) {
@@ -44,7 +47,7 @@ public class AdminController {
     @PostMapping("/verifyListedAuction")
     public ResponseEntity<?> verifyListedAuction(@Valid @RequestBody AuctionVerificationRequest request) {
         try {
-            Auction auction = adminService.verifyListedAuction(request.getAuctionId());
+            Auction auction = auctionService.verifyListedAuction(request.getAuctionId());
 
             if (auction == null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
