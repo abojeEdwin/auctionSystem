@@ -1,5 +1,6 @@
 package com.auctionSystem.service;
 import com.auctionSystem.Util.HashPassword;
+import com.auctionSystem.Util.ValidateBid;
 import com.auctionSystem.Util.VerifyEmail;
 import com.auctionSystem.controller.BidSocketController;
 import com.auctionSystem.data.model.Auction;
@@ -37,6 +38,8 @@ public class UserService {
     JwtService jwtService;
     @Autowired
     HashPassword hashPassword;
+    @Autowired
+    ValidateBid validateBid;
 
     public User register(User user) {
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
@@ -79,26 +82,17 @@ public class UserService {
     }
 
     public Bid placeBid(Bid bidPlaced) {
-        validateBid(bidPlaced);
-        validateAuction(bidPlaced);
+        validateBid.validateBid(bidPlaced);
+        validateBid.validateAuction(bidPlaced);
         Bid savedBid = bidRepository.save(bidPlaced);
         bidSocketController.notifyNewBid(savedBid);
         return savedBid;
     }
 
 
-    private void  validateBid(Bid bid){
-       if(bid.getAuctionItemId().isEmpty() || bid.getAuctionItemId() .equals(" ")){throw new NullAuctionException("Auction item id cannot be empty");}
-       if(bid.getAmount()<=0){throw new NullAuctionException("Auction amount cannot be less than 0");}
-       if(bid.getTimestamp()==null){throw new NullAuctionException("Timestamp cannot be null");}
-       if(bid.getBidderId()==null || bid.getBidderId().equals(" ") || bid.getBidderId().isEmpty()){throw new NullAuctionException("Bidder id cannot be null");}
-    }
 
-    private void validateAuction(Bid bidPlaced){
-        Auction auctionItem = auctionRepository.findAuctionById(bidPlaced.getAuctionItemId());
-        if(auctionItem.getStatus()== AuctionStatus.PENDING){throw new AuctionNotFoundException("Auction item is still pending");}
-        if(bidPlaced.getAmount() < auctionItem.getStartingPrice() || bidPlaced.getAmount() < auctionItem.getCurrentPrice()){ throw new NullAuctionException("Bid amount must be greater than or equal to the starting price");}
-    }
+
+
 
     public Bid getBidHistory(@NotNull String auctionItemId) {
         if(auctionItemId == null){throw new NullAuctionException("Auction id is required");}
