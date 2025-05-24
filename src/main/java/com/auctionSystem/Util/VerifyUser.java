@@ -1,8 +1,6 @@
 package com.auctionSystem.Util;
 import com.auctionSystem.data.model.User;
 import com.auctionSystem.data.repository.UserRepository;
-import com.auctionSystem.exceptions.DuplicateEmailException;
-import com.auctionSystem.exceptions.DuplicateUserNameException;
 import com.auctionSystem.exceptions.InvalidCredentialException;
 import com.auctionSystem.exceptions.InvalidEmailException;
 import org.springframework.beans.factory.annotation.Autowired;

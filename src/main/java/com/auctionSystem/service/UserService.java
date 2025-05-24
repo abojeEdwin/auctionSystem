@@ -16,14 +16,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
-import java.util.regex.Pattern;
-
 
 @Slf4j
 @Service
@@ -32,10 +27,8 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     BidRepository bidRepository;
-
     @Autowired
     AuctionRepository auctionRepository;
     @Autowired
@@ -49,8 +42,7 @@ public class UserService {
         if(userRepository.existsByUsername(user.getUsername())) {throw new DuplicateUserNameException("Username already exists");}
         if(userRepository.existsByEmail(user.getEmail())) {throw new DuplicateEmailException("Email already exists");}
         if (!VerifyEmail.isValidEmail(user.getEmail())){throw new InvalidEmailException("Invalid email");};
-        String hashedPassword = HashPassword.hashPassword(user.getPassword());
-        user.setPassword(hashedPassword);
+        user.setPassword(HashPassword.hashPassword(user.getPassword()));
         return userRepository.save(user);
     }
 
